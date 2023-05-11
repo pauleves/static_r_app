@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+
+<!-- Word cloud Code exmaples based on / credited to https://github.com/holtzy/D3-graph-gallery -->
+
+<!-- Add a svg area, empty -->
+<svg id="dataviz_area" height=200 width=450></svg>
+
+<!-- Load d3.js -->
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<!-- Load d3-cloud -->
+<script src="https://cdn.jsdelivr.net/gh/holtzy/D3-graph-gallery@master/LIB/d3.layout.cloud.js"></script>
+
+<script>
+var svg = d3.select("#dataviz_area")
+svg.append("circle")
+  .attr("cx", 2).attr("cy", 2).attr("r", 40).style("fill", "blue");
+svg.append("circle")
+  .attr("cx", 140).attr("cy", 70).attr("r", 40).style("fill", "red");
+svg.append("circle")
+  .attr("cx", 300).attr("cy", 100).attr("r", 40).style("fill", "green");
+</script>
+
+<div id="my_dataviz"></div>
+<script>
+
+// List of words
+var myWords = ["Banana", "Apple", "Orange", "Pear", "Strawberry", "Raspberry"]
+
+// set the dimensions and margins of the graph
+var margin = {top: 10, right: 10, bottom: 10, left: 10},
+    width = 450 - margin.left - margin.right,
+    height = 450 - margin.top - margin.bottom;
+
+// append the svg object to the body of the page
+var svg = d3.select("#my_dataviz").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform",
+          "translate(" + margin.left + "," + margin.top + ")");
+
+// Constructs a new cloud layout instance. It run an algorithm to find the position of words that suits your requirements
+var layout = d3.layout.cloud()
+  .size([width, height])
+  .words(myWords.map(function(d) { return {text: d}; }))
+  .padding(10)
+  .fontSize(60)
+  .on("end", draw);
+layout.start();
+
+// This function takes the output of 'layout' above and draw the words
+// Better not to touch it. To change parameters, play with the 'layout' variable above
+function draw(words) {
+  svg
+    .append("g")
+      .attr("transform", "translate(" + layout.size()[0] / 2 + "," + layout.size()[1] / 2 + ")")
+      .selectAll("text")
+        .data(words)
+      .enter().append("text")
+        .style("font-size", function(d) { return d.size + "px"; })
+        .attr("text-anchor", "middle")
+        .attr("transform", function(d) {
+          return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+        })
+        .text(function(d) { return d.text; });
+}
+</script>
